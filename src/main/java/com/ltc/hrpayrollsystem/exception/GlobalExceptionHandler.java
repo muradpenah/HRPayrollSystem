@@ -11,6 +11,17 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(DuplicatePayrollException.class)
+    public ResponseEntity<String> duplicatePayrollHandler(DuplicatePayrollException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(PayrollNotFoundException.class)
+    public ResponseEntity<String> payrollNotFoundHandler(PayrollNotFoundException ex){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
     @ExceptionHandler(EmployeeNotFoundException.class)
     public ResponseEntity<String> employeeNotFoundHandler(EmployeeNotFoundException ex){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
@@ -21,8 +32,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
-    @ExceptionHandler(EmployeeAlreadyNotExistDepartmentException.class)
-    public ResponseEntity<String> employeeAlreadyNotExistDepartmentHandler(EmployeeAlreadyNotExistDepartmentException ex){
+    @ExceptionHandler(DepartmentNotActiveException.class)
+    public ResponseEntity<String> departmentNotActiveHandler(DepartmentNotActiveException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(EmployeeAlreadyExistDepartmentException.class)
+    public ResponseEntity<String> employeeAlreadyNotExistDepartmentHandler(EmployeeAlreadyExistDepartmentException ex){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 

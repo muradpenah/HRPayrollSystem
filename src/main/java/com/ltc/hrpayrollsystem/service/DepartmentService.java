@@ -2,6 +2,7 @@ package com.ltc.hrpayrollsystem.service;
 
 import com.ltc.hrpayrollsystem.dto.request.DepartmentRequestDto;
 import com.ltc.hrpayrollsystem.dto.response.DepartmentResponseDto;
+import com.ltc.hrpayrollsystem.enumaration.DepartmentStatus;
 
 import java.util.List;
 
@@ -15,4 +16,6 @@ public interface DepartmentService {
     DepartmentResponseDto updateDepartment(Long id, DepartmentRequestDto departmentRequestDto);
     //D
     void deleteDepartment(Long id);
+    //Patch
+    DepartmentResponseDto changeDepartmentStatus(Long id, DepartmentStatus newStatus);
 }

@@ -11,4 +11,6 @@ import java.util.List;
 public interface EmployeeRepo extends JpaRepository<Employee,Long> {
     @Query("SELECT e FROM Employee e WHERE e.department.id = :departmentId")
     List<Employee> findByDepartmentId(@Param("departmentId") Long departmentId);
+    @Query("SELECT COUNT(e) FROM Employee e WHERE e.department.id = :departmentId")
+    long countByDepartmentId(@Param("departmentId") Long departmentId);
 }

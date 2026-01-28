@@ -2,6 +2,7 @@ package com.ltc.hrpayrollsystem.controller;
 
 import com.ltc.hrpayrollsystem.dto.request.DepartmentRequestDto;
 import com.ltc.hrpayrollsystem.dto.response.DepartmentResponseDto;
+import com.ltc.hrpayrollsystem.enumaration.DepartmentStatus;
 import com.ltc.hrpayrollsystem.service.impl.DepartmentServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,6 +47,14 @@ public class DepartmentController {
     @Operation(summary = "Department updating operation by ID")
     public ResponseEntity<DepartmentResponseDto> updateDepartment(@PathVariable Long id, @RequestBody DepartmentRequestDto departmentRequestDto){
         return ResponseEntity.status(HttpStatus.OK).body(departmentService.updateDepartment(id,departmentRequestDto));
+    }
+
+    @PatchMapping("/{id}/status")
+    @Operation(summary = "Department status changing operation by ID")
+    public ResponseEntity<DepartmentResponseDto> updateStatus(
+            @PathVariable Long id,
+            @RequestParam DepartmentStatus status) {
+        return ResponseEntity.status(HttpStatus.OK).body(departmentService.changeDepartmentStatus(id, status));
     }
 
     @DeleteMapping("/delete/{id}")

@@ -20,16 +20,16 @@ public class PayrollRequestDto {
     @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate paymentDate;
-    @NotNull
-    private PaymentMonth paymentMonth;
+   // @NotNull
+   // private PaymentMonth paymentMonth;
     @NotNull
     @Positive
     private double bonusAmount;
-    @NotNull
-    @Positive
-    private double taxAmount;
-    @NotNull
-    @Positive
-    private double netSalary;
+  //  @NotNull
+  //  @Positive
+  //  private double taxAmount;
+  //  @NotNull
+  //  @Positive
+  //  private double netSalary;
     private Long employeeId;
 }

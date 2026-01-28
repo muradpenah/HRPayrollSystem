@@ -33,9 +33,11 @@ public class Payroll {
     private double taxPercentage=0.18;
 
     @Column(nullable = false)
+    @Positive
     private double taxAmount;
 
     @Column(nullable = false)
+    @Positive
     private double netSalary;
 
     @ManyToOne(fetch = FetchType.LAZY)

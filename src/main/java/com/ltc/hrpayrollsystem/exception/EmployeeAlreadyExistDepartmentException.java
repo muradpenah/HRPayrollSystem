@@ -1,7 +1,7 @@
 package com.ltc.hrpayrollsystem.exception;
 
-public class EmployeeAlreadyNotExistDepartmentException extends RuntimeException {
-    public EmployeeAlreadyNotExistDepartmentException(String message) {
+public class EmployeeAlreadyExistDepartmentException extends RuntimeException {
+    public EmployeeAlreadyExistDepartmentException(String message) {
         super(message);
     }
 }

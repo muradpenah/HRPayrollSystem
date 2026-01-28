@@ -3,9 +3,13 @@ package com.ltc.hrpayrollsystem.service.impl;
 import com.ltc.hrpayrollsystem.dto.request.DepartmentRequestDto;
 import com.ltc.hrpayrollsystem.dto.response.DepartmentResponseDto;
 import com.ltc.hrpayrollsystem.entity.Department;
+import com.ltc.hrpayrollsystem.enumaration.DepartmentStatus;
 import com.ltc.hrpayrollsystem.exception.DepartmentNotFoundException;
+import com.ltc.hrpayrollsystem.exception.EmployeeAlreadyExistDepartmentException;
 import com.ltc.hrpayrollsystem.repo.DepartmentRepo;
+import com.ltc.hrpayrollsystem.repo.EmployeeRepo;
 import com.ltc.hrpayrollsystem.service.DepartmentService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +21,8 @@ import java.util.List;
 @AllArgsConstructor
 public class DepartmentServiceImpl implements DepartmentService {
     private final DepartmentRepo departmentRepo;
+    private final EmployeeRepo employeeRepo;
+
     @Override
     public DepartmentResponseDto createDepartment(DepartmentRequestDto departmentRequestDto) {
         Department department = new Department();
@@ -60,8 +66,28 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public void deleteDepartment(Long id) {
         if(!departmentRepo.existsById(id)){
-            throw new DepartmentNotFoundException("Department not found" + id);
+            throw new DepartmentNotFoundException("Department not found " + id);
         }
         departmentRepo.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public DepartmentResponseDto changeDepartmentStatus(Long id, DepartmentStatus newStatus) {
+        Department department = departmentRepo.findById(id)
+                .orElseThrow(() -> new DepartmentNotFoundException("Departament not found " + id));
+        if (newStatus == DepartmentStatus.CLOSED) {
+            long employeeCount = employeeRepo.countByDepartmentId(id);
+            if (employeeCount > 0) {
+                throw new EmployeeAlreadyExistDepartmentException("Error: Cannot close a department with active employees.");
+            }
+        }
+        department.setStatus(newStatus);
+        Department savedDepartment = departmentRepo.save(department);
+        return new DepartmentResponseDto(
+                savedDepartment.getId(),
+                savedDepartment.getDepartmentName(),
+                savedDepartment.getDepartmentAddress(),
+                savedDepartment.getStatus());
     }
 }
