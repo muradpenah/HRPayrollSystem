@@ -1,13 +1,18 @@
 package com.ltc.hrpayrollsystem.service.impl;
 
+import com.ltc.hrpayrollsystem.dto.DepartmentMonthlySummaryDTO;
+import com.ltc.hrpayrollsystem.dto.EmployeeAnnualSummaryDTO;
 import com.ltc.hrpayrollsystem.dto.request.PayrollRequestDto;
 import com.ltc.hrpayrollsystem.dto.response.PayrollResponseDto;
+import com.ltc.hrpayrollsystem.entity.Department;
 import com.ltc.hrpayrollsystem.entity.Employee;
 import com.ltc.hrpayrollsystem.entity.Payroll;
 import com.ltc.hrpayrollsystem.enumaration.PaymentMonth;
+import com.ltc.hrpayrollsystem.exception.DepartmentNotFoundException;
 import com.ltc.hrpayrollsystem.exception.DuplicatePayrollException;
 import com.ltc.hrpayrollsystem.exception.EmployeeNotFoundException;
 import com.ltc.hrpayrollsystem.exception.PayrollNotFoundException;
+import com.ltc.hrpayrollsystem.repo.DepartmentRepo;
 import com.ltc.hrpayrollsystem.repo.EmployeeRepo;
 import com.ltc.hrpayrollsystem.repo.PayrollRepo;
 import com.ltc.hrpayrollsystem.service.PayrollService;
@@ -25,6 +30,7 @@ import java.util.List;
 public class PayrollServiceImpl implements PayrollService {
     private final PayrollRepo payrollRepo;
     private final EmployeeRepo employeeRepo;
+    private final DepartmentRepo departmentRepo;
     @Override
     public PayrollResponseDto savePayroll(PayrollRequestDto payrollRequestDto) {
         Employee employee = employeeRepo.findById(payrollRequestDto.getEmployeeId()).orElseThrow(
@@ -141,7 +147,7 @@ public class PayrollServiceImpl implements PayrollService {
     public List<PayrollResponseDto> findByEmployeeId(Long employeeId) {
         List<Payroll> payrolls = payrollRepo.findByEmployeeId(employeeId);
         if(payrolls.isEmpty()){
-            throw new EmployeeNotFoundException("Employee not found" + employeeId);
+            throw new EmployeeNotFoundException("Employee not found " + employeeId);
         }
         return payrolls.stream().map(payroll -> new PayrollResponseDto(
                 payroll.getId(),
@@ -152,5 +158,72 @@ public class PayrollServiceImpl implements PayrollService {
                 payroll.getTaxAmount(),
                 payroll.getNetSalary(),
                 payroll.getEmployee().getId())).toList();
+    }
+
+    @Override
+    public List<PayrollResponseDto> findByDepartmentAndDate(Long departmentId, PaymentMonth month, int year) {
+        Department department = departmentRepo.findById(departmentId).orElseThrow(
+                () -> new DepartmentNotFoundException("Department not found " + departmentId)
+        );
+        return payrollRepo.findByDepartmentAndMonth(departmentId,month,year).stream().map(
+                payroll -> new PayrollResponseDto(
+                payroll.getId(),
+                payroll.getPaymentDate(),
+                payroll.getPaymentMonth(),
+                payroll.getBonusAmount(),
+                payroll.getTaxPercentage(),
+                payroll.getTaxAmount(),
+                payroll.getNetSalary(),
+                payroll.getEmployee().getId())).toList();
+    }
+
+    @Override
+    public List<PayrollResponseDto> findHistoryByEmployeeId(Long employeeId) {
+        List<Payroll> payrolls = payrollRepo.findHistoryByEmployee(employeeId);
+        if(payrolls.isEmpty()){
+            throw new EmployeeNotFoundException("Employee not found " + employeeId);
+        }
+        return payrolls.stream().map(payroll -> new PayrollResponseDto(
+                payroll.getId(),
+                payroll.getPaymentDate(),
+                payroll.getPaymentMonth(),
+                payroll.getBonusAmount(),
+                payroll.getTaxPercentage(),
+                payroll.getTaxAmount(),
+                payroll.getNetSalary(),
+                payroll.getEmployee().getId())).toList();
+    }
+
+    @Override
+    public List<PayrollResponseDto> findByEmployeeAndDate(Long employeeId, PaymentMonth month, int year) {
+        List<Payroll> payrolls = payrollRepo.findByEmployeeAndMonth(employeeId,month,year);
+        if(payrolls.isEmpty()){
+            throw new EmployeeNotFoundException("Employee not found " + employeeId);
+        }
+        return payrolls.stream().map(payroll -> new PayrollResponseDto(
+                payroll.getId(),
+                payroll.getPaymentDate(),
+                payroll.getPaymentMonth(),
+                payroll.getBonusAmount(),
+                payroll.getTaxPercentage(),
+                payroll.getTaxAmount(),
+                payroll.getNetSalary(),
+                payroll.getEmployee().getId())).toList();
+    }
+
+    @Override
+    public DepartmentMonthlySummaryDTO getDepartmentMonthlyStats(Long departmentId, PaymentMonth month, int year) {
+        Department department = departmentRepo.findById(departmentId).orElseThrow(
+                () -> new DepartmentNotFoundException("Department not found " + departmentId)
+        );
+        return payrollRepo.getDepartmentMonthlyStats(departmentId,month,year);
+    }
+
+    @Override
+    public EmployeeAnnualSummaryDTO getEmployeeAnnualStats(Long employeeId, int year) {
+        Employee employee = employeeRepo.findById(employeeId).orElseThrow(
+                () -> new EmployeeNotFoundException("Employee not found " + employeeId)
+        );
+        return payrollRepo.getEmployeeAnnualStats(employeeId,year);
     }
 }

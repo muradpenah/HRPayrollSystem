@@ -1,9 +1,12 @@
 package com.ltc.hrpayrollsystem.controller;
 
+import com.ltc.hrpayrollsystem.dto.DepartmentMonthlySummaryDTO;
+import com.ltc.hrpayrollsystem.dto.EmployeeAnnualSummaryDTO;
 import com.ltc.hrpayrollsystem.dto.request.EmployeeRequestDto;
 import com.ltc.hrpayrollsystem.dto.request.PayrollRequestDto;
 import com.ltc.hrpayrollsystem.dto.response.EmployeeResponseDto;
 import com.ltc.hrpayrollsystem.dto.response.PayrollResponseDto;
+import com.ltc.hrpayrollsystem.enumaration.PaymentMonth;
 import com.ltc.hrpayrollsystem.service.impl.PayrollServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -85,7 +88,32 @@ public class PayrollController {
     }
 
     @GetMapping(path = "/getEmployee/{employeeId}")
-    public ResponseEntity<List<PayrollResponseDto>> findByDepartmentId(@RequestParam Long employeeId) {
+    public ResponseEntity<List<PayrollResponseDto>> findByDepartmentId(@PathVariable Long employeeId) {
         return ResponseEntity.status(HttpStatus.OK).body(payrollService.findByEmployeeId(employeeId));
+    }
+
+    @GetMapping(path = "getByDepartmentAndDate")
+    public ResponseEntity<List<PayrollResponseDto>> findByDepartmentAndDate(@RequestParam Long DepartmentId, @RequestParam PaymentMonth month, @RequestParam int year){
+        return ResponseEntity.status(HttpStatus.OK).body(payrollService.findByDepartmentAndDate(DepartmentId,month,year));
+    }
+
+    @GetMapping(path = "getHistoryByEmployeeId")
+    public ResponseEntity<List<PayrollResponseDto>> findByEmployeeId(@RequestParam Long employeeId){
+        return ResponseEntity.status(HttpStatus.OK).body(payrollService.findByEmployeeId(employeeId));
+    }
+
+    @GetMapping(path = "getByEmployeeAndDate")
+    public ResponseEntity<List<PayrollResponseDto>> findByEmployeeAndDate(@RequestParam Long employeeId, @RequestParam PaymentMonth month, @RequestParam int year){
+        return ResponseEntity.status(HttpStatus.OK).body(payrollService.findByEmployeeAndDate(employeeId,month,year));
+    }
+
+    @GetMapping(path = "getDepartmentMonthlyStats")
+    public ResponseEntity<DepartmentMonthlySummaryDTO> getDepartmentMonthlyStats(@RequestParam Long departmentId, @RequestParam PaymentMonth month, @RequestParam int year){
+        return ResponseEntity.status(HttpStatus.OK).body(payrollService.getDepartmentMonthlyStats(departmentId,month,year));
+    }
+
+    @GetMapping(path = "getEmployeeAnnualStats")
+    public ResponseEntity<EmployeeAnnualSummaryDTO> getEmployeeAnnualStats(@RequestParam Long employeeId, @RequestParam int year){
+        return ResponseEntity.status(HttpStatus.OK).body(payrollService.getEmployeeAnnualStats(employeeId,year));
     }
 }

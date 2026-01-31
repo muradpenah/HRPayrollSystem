@@ -18,4 +18,9 @@ public interface DepartmentService {
     void deleteDepartment(Long id);
     //Patch
     DepartmentResponseDto changeDepartmentStatus(Long id, DepartmentStatus newStatus);
+    //Query
+    long countByDepartmentId(Long departmentId);
+    double calculateTotalSalaryByDepartment(Long departmentId);
+    double calculateAverageSalaryByDepartment(Long departmentId);
+
 }

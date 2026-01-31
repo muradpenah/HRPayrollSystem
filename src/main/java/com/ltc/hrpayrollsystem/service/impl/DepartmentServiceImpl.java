@@ -90,4 +90,26 @@ public class DepartmentServiceImpl implements DepartmentService {
                 savedDepartment.getDepartmentAddress(),
                 savedDepartment.getStatus());
     }
+
+    @Override
+    public double calculateAverageSalaryByDepartment(Long departmentId) {
+        Department exist = departmentRepo.findById(departmentId).orElseThrow(()->
+                new DepartmentNotFoundException("Department not found" + departmentId));
+        double averageSalary = employeeRepo.calculateTotalPayrollByDepartment(departmentId) / employeeRepo.countByDepartmentId(departmentId);
+        return averageSalary;
+    }
+
+    @Override
+    public long countByDepartmentId(Long departmentId) {
+        Department exist = departmentRepo.findById(departmentId).orElseThrow(()->
+                new DepartmentNotFoundException("Department not found" + departmentId));
+        return employeeRepo.countByDepartmentId(departmentId);
+    }
+
+    @Override
+    public double calculateTotalSalaryByDepartment(Long departmentId) {
+        Department exist = departmentRepo.findById(departmentId).orElseThrow(()->
+                new DepartmentNotFoundException("Department not found" + departmentId));
+        return employeeRepo.calculateTotalPayrollByDepartment(departmentId);
+    }
 }

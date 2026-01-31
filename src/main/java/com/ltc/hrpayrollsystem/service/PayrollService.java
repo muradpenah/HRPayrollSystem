@@ -1,7 +1,10 @@
 package com.ltc.hrpayrollsystem.service;
 
+import com.ltc.hrpayrollsystem.dto.DepartmentMonthlySummaryDTO;
+import com.ltc.hrpayrollsystem.dto.EmployeeAnnualSummaryDTO;
 import com.ltc.hrpayrollsystem.dto.request.PayrollRequestDto;
 import com.ltc.hrpayrollsystem.dto.response.PayrollResponseDto;
+import com.ltc.hrpayrollsystem.enumaration.PaymentMonth;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -19,4 +22,10 @@ public interface PayrollService {
     void deletePayroll(Long id);
     //Query
     List<PayrollResponseDto> findByEmployeeId(Long employeeId);
+
+    List<PayrollResponseDto>  findHistoryByEmployeeId(Long employeeId);
+    List<PayrollResponseDto> findByDepartmentAndDate(Long departmentId, PaymentMonth month, int year);
+    List<PayrollResponseDto> findByEmployeeAndDate(Long employeeId, PaymentMonth month, int year);
+    DepartmentMonthlySummaryDTO getDepartmentMonthlyStats(Long departmentId, PaymentMonth month, int year);
+    EmployeeAnnualSummaryDTO getEmployeeAnnualStats(Long employeeId, int year);
 }

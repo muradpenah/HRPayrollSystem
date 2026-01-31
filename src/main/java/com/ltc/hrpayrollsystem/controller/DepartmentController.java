@@ -63,4 +63,19 @@ public class DepartmentController {
         departmentService.deleteDepartment(id);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Department deleted successfully by ID: "+id);
     }
+
+    @GetMapping("/countEmployees")
+    public ResponseEntity<Long> countEmployees(@RequestParam Long departmentId){
+        return ResponseEntity.status(HttpStatus.OK).body(departmentService.countByDepartmentId(departmentId));
+    }
+
+    @GetMapping("/totalMonthlyPayrollCost")
+    public ResponseEntity<Double> totalcost(@RequestParam Long departmentId){
+        return ResponseEntity.status(HttpStatus.OK).body(departmentService.calculateTotalSalaryByDepartment(departmentId));
+    }
+
+    @GetMapping("/AverageSalary")
+    public ResponseEntity<Double> averageSalary(@RequestParam Long departmentId){
+        return ResponseEntity.status(HttpStatus.OK).body(departmentService.calculateAverageSalaryByDepartment(departmentId));
+    }
 }
