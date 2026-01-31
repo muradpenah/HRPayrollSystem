@@ -1,0 +1,139 @@
+/* HR Payroll System - Özəl stil */
+
+:root {
+    --primary-gradient: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+    --card-employees: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+    --card-departments: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    --card-payrolls: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+    --card-salary: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #f8fafc;
+    color: #1e293b;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar {
+    background: var(--primary-gradient) !important;
+}
+
+.navbar-brand {
+    font-size: 1.35rem;
+    letter-spacing: -0.02em;
+}
+
+.section-title {
+    color: #1e3a5f;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* Summary kartları */
+.summary-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.summary-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover) !important;
+}
+
+.card-employees {
+    background: var(--card-employees);
+    color: #fff;
+}
+
+.card-departments {
+    background: var(--card-departments);
+    color: #fff;
+}
+
+.card-payrolls {
+    background: var(--card-payrolls);
+    color: #fff;
+}
+
+.card-salary {
+    background: var(--card-salary);
+    color: #fff;
+}
+
+.card-label {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    letter-spacing: 0.05em;
+}
+
+.card-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.card-icon {
+    font-size: 2rem;
+    opacity: 0.85;
+}
+
+/* Cədvəl */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table thead th {
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem 0.75rem;
+}
+
+.table tbody td {
+    padding: 0.875rem 0.75rem;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(30, 58, 95, 0.04);
+}
+
+/* Position stats kartları */
+#positionStatsCards .card {
+    border-radius: 10px;
+    transition: box-shadow 0.2s ease;
+}
+
+#positionStatsCards .card:hover {
+    box-shadow: var(--shadow-hover) !important;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}
+
+.nav-pills .nav-link { color: rgba(255,255,255,0.8); }
+.nav-pills .nav-link:hover { color: #fff; background: rgba(255,255,255,0.2); }
+.nav-pills .nav-link.active { background: rgba(255,255,255,0.3); color: #fff; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-value {
+        font-size: 1.4rem;
+    }
+
+    .card-icon {
+        font-size: 1.5rem;
+    }
+}

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Payroll System | Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#"><i class="bi bi-bank2 me-2"></i>HR Payroll System</a>
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a class="nav-link text-white" href="#" data-tab="dashboard">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="#" data-tab="departments">Departamentlər</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="#" data-tab="employees">İşçilər</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="#" data-tab="payrolls">Maaş Ödənişləri</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="#" data-tab="queries">Sorgular</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container-fluid py-4">
+        <!-- DASHBOARD TAB -->
+        <div id="tab-dashboard" class="tab-pane">
+            <h2 class="mb-4">Dashboard</h2>
+            <div id="summaryLoading" class="text-center py-5">
+                <div class="spinner-border text-primary"></div>
+                <p class="mt-2 text-muted">Statistika yüklənir...</p>
+            </div>
+            <div id="summaryCards" class="row g-4 mb-5" style="display:none;">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card summary-card card-departments h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <p class="card-label text-uppercase mb-1">Departamentlər</p>
+                            <h2 class="card-value mb-0" id="totalDepartments">0</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card summary-card card-employees h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <p class="card-label text-uppercase mb-1">İşçilər</p>
+                            <h2 class="card-value mb-0" id="totalEmployees">0</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card summary-card card-payrolls h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <p class="card-label text-uppercase mb-1">Maaş Ödənişləri</p>
+                            <h2 class="card-value mb-0" id="totalPayrolls">0</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card summary-card card-salary h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <p class="card-label text-uppercase mb-1">Cəmi Net Maaş</p>
+                            <h2 class="card-value mb-0" id="totalNetPaid">0 ₼</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="positionStatsSection" class="mb-5" style="display:none;">
+                <h4 class="mb-3">Vəzifə Statistikası (getEmployeePositionStats)</h4>
+                <div class="row g-3" id="positionStatsCards"></div>
+            </div>
+        </div>
+
+        <!-- DEPARTMENTS TAB -->
+        <div id="tab-departments" class="tab-pane" style="display:none;">
+            <h2 class="mb-4">Departamentlər</h2>
+            <div class="mb-3">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalDeptCreate"><i class="bi bi-plus-lg"></i> Yeni Departament</button>
+            </div>
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Departament stats (countEmployees, totalMonthlyPayrollCost, AverageSalary)</label>
+                    <div class="input-group">
+                        <select id="deptStatsSelect" class="form-select">
+                            <option value="">Departament seçin</option>
+                        </select>
+                        <button class="btn btn-outline-secondary" onclick="loadDeptStats()">Yüklə</button>
+                    </div>
+                    <div id="deptStatsResult" class="mt-2 small"></div>
+                </div>
+            </div>
+            <div id="departmentsTableWrapper" class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark"><tr><th>ID</th><th>Ad</th><th>Ünvan</th><th>Status</th><th>Əməliyyat</th></tr></thead>
+                    <tbody id="departmentsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- EMPLOYEES TAB -->
+        <div id="tab-employees" class="tab-pane" style="display:none;">
+            <h2 class="mb-4">İşçilər</h2>
+            <div class="mb-3">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalEmpCreate"><i class="bi bi-plus-lg"></i> Yeni İşçi</button>
+            </div>
+            <div class="card mb-4">
+                <div class="card-header">Filtrlər və Sorgular</div>
+                <div class="card-body">
+                    <div class="row g-2 mb-2">
+                        <div class="col-auto"><input id="empSearchKeyword" class="form-control" placeholder="Axtarış (searchByKeyword)" size="20"></div>
+                        <div class="col-auto"><button class="btn btn-outline-primary" onclick="loadEmployeesBySearch()">Axtar</button></div>
+                        <div class="col-auto">
+                            <select id="empDeptFilter" class="form-select" style="width:auto">
+                                <option value="">Departament (getDepartment)</option>
+                            </select>
+                        </div>
+                        <div class="col-auto"><button class="btn btn-outline-primary" onclick="loadEmployeesByDept()">Departamentə görə</button></div>
+                    </div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-auto"><input id="empMinSalary" type="number" class="form-control" placeholder="Min maaş" style="width:100px"></div>
+                        <div class="col-auto"><input id="empMaxSalary" type="number" class="form-control" placeholder="Max maaş" style="width:100px"></div>
+                        <div class="col-auto"><select id="empDeptSalary" class="form-select" style="width:150px"><option value="">Dept seçin</option></select></div>
+                        <div class="col-auto"><button class="btn btn-outline-primary" onclick="loadEmployeesFilterBySalary()">filterBySalary</button></div>
+                    </div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-auto"><select id="empTopEarnerDept" class="form-select" style="width:150px"><option value="">Dept seçin</option></select></div>
+                        <div class="col-auto"><button class="btn btn-outline-primary" onclick="loadTopEarners()">topEarner</button></div>
+                        <div class="col-auto"><select id="empCheckEmailsDept" class="form-select" style="width:150px"><option value="">Dept seçin</option></select></div>
+                        <div class="col-auto"><button class="btn btn-outline-primary" onclick="loadCheckEmails()">checkEmails</button></div>
+                    </div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-auto"><select id="empSortDept" class="form-select" style="width:150px"><option value="">Dept seçin</option></select></div>
+                        <div class="col-auto"><button class="btn btn-outline-secondary btn-sm" onclick="loadEmployeesSort('sortSalaryByASC')">Maaş ↑</button></div>
+                        <div class="col-auto"><button class="btn btn-outline-secondary btn-sm" onclick="loadEmployeesSort('sortSalaryByDESC')">Maaş ↓</button></div>
+                        <div class="col-auto"><button class="btn btn-outline-secondary btn-sm" onclick="loadEmployeesSort('sortNameByASC')">Ad ↑</button></div>
+                        <div class="col-auto"><button class="btn btn-outline-secondary btn-sm" onclick="loadEmployeesSort('sortNameByDESC')">Ad ↓</button></div>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-auto"><input id="empStartDate" type="date" class="form-control"></div>
+                        <div class="col-auto"><input id="empEndDate" type="date" class="form-control"></div>
+                        <div class="col-auto"><input id="empMinSalaryFilter" type="number" class="form-control" placeholder="Min maaş" style="width:100px"></div>
+                        <div class="col-auto"><button class="btn btn-outline-primary" onclick="loadFilterDateAndSalary()">filterDateAndSalary</button></div>
+                        <div class="col-auto"><select id="empUnpaidMonth" class="form-select" style="width:100px"><option value="JANUARY">Yanvar</option><option value="FEBRUARY">Fevral</option><option value="MARCH">Mart</option><option value="APRIL">Aprel</option><option value="MAY">May</option><option value="JUNE">İyun</option><option value="JULY">İyul</option><option value="AUGUST">Avqust</option><option value="SEPTEMBER">Sentyabr</option><option value="OCTOBER">Oktyabr</option><option value="NOVEMBER">Noyabr</option><option value="DECEMBER">Dekabr</option></select></div>
+                        <div class="col-auto"><input id="empUnpaidYear" type="number" class="form-control" placeholder="İl" value="2025" style="width:80px"></div>
+                        <div class="col-auto"><button class="btn btn-outline-primary" onclick="loadFindUnpaid()">findUnpaidEmployees</button></div>
+                    </div>
+                </div>
+            </div>
+            <div id="employeesTableWrapper" class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark"><tr><th>#</th><th>Ad Soyad</th><th>Vəzifə</th><th>Əmək Haqqı</th><th>İşə Giriş</th><th>Email</th><th>Telefon</th><th>Dept ID</th><th>Əməliyyat</th></tr></thead>
+                    <tbody id="employeesTableBody"></tbody>
+                </table>
+                <div id="employeesPagination" class="mt-2"></div>
+            </div>
+        </div>
+
+        <!-- PAYROLLS TAB -->
+        <div id="tab-payrolls" class="tab-pane" style="display:none;">
+            <h2 class="mb-4">Maaş Ödənişləri</h2>
+            <div class="mb-3">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPayrollCreate"><i class="bi bi-plus-lg"></i> Yeni Ödəniş</button>
+            </div>
+            <div id="payrollsTableWrapper" class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark"><tr><th>ID</th><th>Tarix</th><th>Ay</th><th>Bonus</th><th>Vergi</th><th>Net</th><th>İşçi ID</th><th>Əməliyyat</th></tr></thead>
+                    <tbody id="payrollsTableBody"></tbody>
+                </table>
+                <div id="payrollsPagination"></div>
+            </div>
+        </div>
+
+        <!-- QUERIES TAB -->
+        <div id="tab-queries" class="tab-pane" style="display:none;">
+            <h2 class="mb-4">Payroll Sorguları</h2>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">getEmployee / getHistoryByEmployeeId</div>
+                        <div class="card-body">
+                            <input id="qEmpId" type="number" class="form-control mb-2" placeholder="İşçi ID">
+                            <button class="btn btn-primary btn-sm me-1" onclick="loadPayrollByEmployee()">getEmployee (payrolls/getEmployee/{id})</button>
+                            <button class="btn btn-secondary btn-sm" onclick="loadHistoryByEmployeeId()">getHistoryByEmployeeId</button>
+                            <pre id="qEmpResult" class="mt-2 small bg-light p-2" style="max-height:200px;overflow:auto"></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">getByDepartmentAndDate</div>
+                        <div class="card-body">
+                            <select id="qDeptId" class="form-select mb-2"><option value="">Departament</option></select>
+                            <select id="qMonth" class="form-select mb-2"><option value="JANUARY">Yanvar</option><option value="FEBRUARY">Fevral</option><option value="MARCH">Mart</option><option value="APRIL">Aprel</option><option value="MAY">May</option><option value="JUNE">İyun</option><option value="JULY">İyul</option><option value="AUGUST">Avqust</option><option value="SEPTEMBER">Sentyabr</option><option value="OCTOBER">Oktyabr</option><option value="NOVEMBER">Noyabr</option><option value="DECEMBER">Dekabr</option></select>
+                            <input id="qYear" type="number" class="form-control mb-2" value="2025" placeholder="İl">
+                            <button class="btn btn-primary btn-sm" onclick="loadByDepartmentAndDate()">Yüklə</button>
+                            <pre id="qDeptDateResult" class="mt-2 small bg-light p-2" style="max-height:200px;overflow:auto"></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">getByEmployeeAndDate</div>
+                        <div class="card-body">
+                            <input id="qEmpId2" type="number" class="form-control mb-2" placeholder="İşçi ID">
+                            <select id="qMonth2" class="form-select mb-2"><option value="JANUARY">Yanvar</option><option value="FEBRUARY">Fevral</option><option value="MARCH">Mart</option><option value="APRIL">Aprel</option><option value="MAY">May</option><option value="JUNE">İyun</option><option value="JULY">İyul</option><option value="AUGUST">Avqust</option><option value="SEPTEMBER">Sentyabr</option><option value="OCTOBER">Oktyabr</option><option value="NOVEMBER">Noyabr</option><option value="DECEMBER">Dekabr</option></select>
+                            <input id="qYear2" type="number" class="form-control mb-2" value="2025" placeholder="İl">
+                            <button class="btn btn-primary btn-sm" onclick="loadByEmployeeAndDate()">Yüklə</button>
+                            <pre id="qEmpDateResult" class="mt-2 small bg-light p-2" style="max-height:200px;overflow:auto"></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">getDepartmentMonthlyStats</div>
+                        <div class="card-body">
+                            <select id="qDeptIdStats" class="form-select mb-2"><option value="">Departament</option></select>
+                            <select id="qMonthStats" class="form-select mb-2"><option value="JANUARY">Yanvar</option><option value="FEBRUARY">Fevral</option><option value="MARCH">Mart</option><option value="APRIL">Aprel</option><option value="MAY">May</option><option value="JUNE">İyun</option><option value="JULY">İyul</option><option value="AUGUST">Avqust</option><option value="SEPTEMBER">Sentyabr</option><option value="OCTOBER">Oktyabr</option><option value="NOVEMBER">Noyabr</option><option value="DECEMBER">Dekabr</option></select>
+                            <input id="qYearStats" type="number" class="form-control mb-2" value="2025" placeholder="İl">
+                            <button class="btn btn-primary btn-sm" onclick="loadDepartmentMonthlyStats()">Yüklə</button>
+                            <pre id="qDeptStatsResult" class="mt-2 small bg-light p-2" style="max-height:200px;overflow:auto"></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">getEmployeeAnnualStats</div>
+                        <div class="card-body">
+                            <input id="qEmpIdAnnual" type="number" class="form-control mb-2" placeholder="İşçi ID">
+                            <input id="qYearAnnual" type="number" class="form-control mb-2" value="2025" placeholder="İl">
+                            <button class="btn btn-primary btn-sm" onclick="loadEmployeeAnnualStats()">Yüklə</button>
+                            <pre id="qAnnualResult" class="mt-2 small bg-light p-2" style="max-height:200px;overflow:auto"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Department Create Modal -->
+    <div class="modal fade" id="modalDeptCreate" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">Yeni Departament (POST /departments/create)</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <input id="deptCreateName" class="form-control mb-2" placeholder="departmentName (3-20 simvol)" required>
+                    <input id="deptCreateAddress" class="form-control" placeholder="departmentAddress" required>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ləğv</button><button type="button" class="btn btn-primary" onclick="createDepartment()">Yarat</button></div>
+            </div>
+        </div>
+    </div>
+    <!-- Department Update Modal -->
+    <div class="modal fade" id="modalDeptUpdate" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">Departament Yenilə (PUT /departments/update/{id})</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <input type="hidden" id="deptUpdateId">
+                    <input id="deptUpdateName" class="form-control mb-2" placeholder="departmentName">
+                    <input id="deptUpdateAddress" class="form-control" placeholder="departmentAddress">
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ləğv</button><button type="button" class="btn btn-primary" onclick="updateDepartment()">Yenilə</button></div>
+            </div>
+        </div>
+    </div>
+    <!-- Department Status Modal -->
+    <div class="modal fade" id="modalDeptStatus" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">Status dəyiş (PATCH /departments/{id}/status)</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <input type="hidden" id="deptStatusId">
+                    <select id="deptStatusSelect" class="form-select"><option value="ACTIVE">ACTIVE</option><option value="INACTIVE">INACTIVE</option><option value="CLOSED">CLOSED</option></select>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ləğv</button><button type="button" class="btn btn-primary" onclick="updateDeptStatus()">Tətbiq et</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Create Modal -->
+    <div class="modal fade" id="modalEmpCreate" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">Yeni İşçi (POST /employees/create)</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <input id="empCreateFullName" class="form-control mb-2" placeholder="fullName" required>
+                    <input id="empCreatePosition" class="form-control mb-2" placeholder="position" required>
+                    <input id="empCreateHireDate" type="date" class="form-control mb-2" required>
+                    <input id="empCreateBaseSalary" type="number" step="0.01" class="form-control mb-2" placeholder="baseSalary" required>
+                    <input id="empCreateEmail" type="email" class="form-control mb-2" placeholder="email">
+                    <input id="empCreatePhone" class="form-control mb-2" placeholder="phoneNumber (+994...)">
+                    <input id="empCreateAddress" class="form-control mb-2" placeholder="address" required>
+                    <select id="empCreateDeptId" class="form-select" placeholder="departmentId"><option value="">departmentId</option></select>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ləğv</button><button type="button" class="btn btn-primary" onclick="createEmployee()">Yarat</button></div>
+            </div>
+        </div>
+    </div>
+    <!-- Employee Update Modal -->
+    <div class="modal fade" id="modalEmpUpdate" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">İşçi Yenilə (PUT /employees/update/{id})</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <input type="hidden" id="empUpdateId">
+                    <input id="empUpdateFullName" class="form-control mb-2" placeholder="fullName">
+                    <input id="empUpdatePosition" class="form-control mb-2" placeholder="position">
+                    <input id="empUpdateHireDate" type="date" class="form-control mb-2">
+                    <input id="empUpdateBaseSalary" type="number" step="0.01" class="form-control mb-2" placeholder="baseSalary">
+                    <input id="empUpdateEmail" type="email" class="form-control mb-2" placeholder="email">
+                    <input id="empUpdatePhone" class="form-control mb-2" placeholder="phoneNumber">
+                    <input id="empUpdateAddress" class="form-control mb-2" placeholder="address">
+                    <select id="empUpdateDeptId" class="form-select"><option value="">departmentId</option></select>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ləğv</button><button type="button" class="btn btn-primary" onclick="updateEmployee()">Yenilə</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payroll Create Modal -->
+    <div class="modal fade" id="modalPayrollCreate" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">Yeni Ödəniş (POST /payrolls/create)</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <input id="payCreatePaymentDate" type="date" class="form-control mb-2" required>
+                    <input id="payCreateBonusAmount" type="number" step="0.01" class="form-control mb-2" placeholder="bonusAmount" required>
+                    <input id="payCreateEmployeeId" type="number" class="form-control" placeholder="employeeId" required>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ləğv</button><button type="button" class="btn btn-primary" onclick="createPayroll()">Yarat</button></div>
+            </div>
+        </div>
+    </div>
+    <!-- Payroll Update Modal -->
+    <div class="modal fade" id="modalPayrollUpdate" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">Ödəniş Yenilə (PUT /payrolls/update/{id})</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <input type="hidden" id="payUpdateId">
+                    <input id="payUpdatePaymentDate" type="date" class="form-control mb-2">
+                    <input id="payUpdateBonusAmount" type="number" step="0.01" class="form-control mb-2" placeholder="bonusAmount">
+                    <input id="payUpdateEmployeeId" type="number" class="form-control" placeholder="employeeId">
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ləğv</button><button type="button" class="btn btn-primary" onclick="updatePayroll()">Yenilə</button></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-5 py-3 text-center text-muted"><small>© HR Payroll System</small></footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
