@@ -33,7 +33,7 @@ public interface EmployeeRepo extends JpaRepository<Employee,Long> {
     List<Employee> findTopEarnersByDepartment(@Param("departmentId") Long departmentId);
 
     // Korporativ olmayan emailləri tapmaq
-    @Query("SELECT e FROM Employee e WHERE e.department.id = :departmentId  AND e.email NOT LIKE '%@sirket.az'")
+    @Query("SELECT e FROM Employee e WHERE e.department.id = :departmentId  AND e.email  NOT  LIKE '%@ltc.com'")
     List<Employee> findEmployeesWithNonCorporateEmails(@Param("departmentId") Long departmentId);
 
     @Query("SELECT e FROM Employee e WHERE e.department.id = :departmentId ORDER BY e.baseSalary  ASC")

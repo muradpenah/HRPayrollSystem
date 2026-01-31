@@ -44,7 +44,7 @@ public interface PayrollRepo extends JpaRepository<Payroll,Long> {
                                                           @Param("month") PaymentMonth month,
                                                           @Param("year") int year);
 
-    @Query("SELECT new com.ltc.hrpayrollsystem.dto.EmployeeAnnualSummaryDTO(p.employee.fullName, SUM(p.employee.baseSalary + p.bonusAmount), SUM(p.taxAmount), SUM(p.netSalary)) FROM Payroll p WHERE p.employee.id = :employeeId AND YEAR(p.paymentDate) = :year")
+    @Query("SELECT new com.ltc.hrpayrollsystem.dto.EmployeeAnnualSummaryDTO(p.employee.fullName, SUM(p.employee.baseSalary + p.bonusAmount), SUM(p.taxAmount), SUM(p.netSalary)) FROM Payroll p WHERE p.employee.id = :employeeId AND YEAR(p.paymentDate) = :year GROUP BY p.employee.fullName")
     EmployeeAnnualSummaryDTO getEmployeeAnnualStats(@Param("employeeId") Long employeeId, @Param("year") int year);
 
 }
